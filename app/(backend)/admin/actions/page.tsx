@@ -262,8 +262,10 @@ export default function ActionHistoryPage() {
       {actions.length > 0 && (
         <div className="mt-6">
           <PaginationComponent
-            page={page}
-            pages={pages}
+            currentPage={page}
+            totalPages={pages}
+            handleNextPage={() => setPage(prev => Math.min(prev + 1, pages))}
+            handlePrevPage={() => setPage(prev => Math.max(prev - 1, 1))}
             onPageChange={setPage}
           />
         </div>

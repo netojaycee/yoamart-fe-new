@@ -4,9 +4,9 @@ import Cookies from "js-cookie";
 import { clearCredentials, setCredentials } from "./slices/authSlice";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5004/api/",
+  // baseUrl: "http://localhost:5004/api/",
   // baseUrl: "https://yoamart.com/api",
-  // baseUrl: "https://yoamart-be-new.onrender.com/api",
+  baseUrl: "https://yoamart-be-new.onrender.com/api",
   prepareHeaders: (headers) => {
     const token = Cookies.get("token");
     if (token) {

@@ -63,7 +63,7 @@ export default function AlertsPage() {
   const [acknowledgeAlert, { isLoading: isAcknowledging }] = useAcknowledgeAlertMutation();
 
   // Fetch open alerts
-  const { data: openAlertsData, isLoading: openLoading, refetch: refetchOpen } = useGetOpenAlertsQuery();
+  const { data: openAlertsData, isLoading: openLoading, refetch: refetchOpen } = useGetOpenAlertsQuery({});
 
   // Fetch all alerts
   const { data: allAlertsData, isLoading: allLoading, refetch: refetchAll } = useGetAllAlertsQuery(
@@ -249,8 +249,10 @@ export default function AlertsPage() {
           {allAlerts.length > 0 && (
             <div className="mt-6">
               <PaginationComponent
-                page={page}
-                pages={pages}
+                currentPage={page}
+                totalPages={pages}
+                handleNextPage={() => setPage(prev => Math.min(prev + 1, pages))}
+                handlePrevPage={() => setPage(prev => Math.max(prev - 1, 1))}
                 onPageChange={setPage}
               />
             </div>

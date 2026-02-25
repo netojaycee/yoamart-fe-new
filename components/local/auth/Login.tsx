@@ -21,13 +21,13 @@ import { loginSchema } from "@/lib/zodSchema";
 import { toast } from "sonner";
 import { useLoginMutation } from "@/redux/appData";
 import Link from "next/link";
-import Recaptcha from "../Recaptcha";
-import { useCaptcha } from "@/hooks/use-captcha";
+// import Recaptcha from "../Recaptcha";
+// import { useCaptcha } from "@/hooks/use-captcha";
 
 export default function Login() {
   const [globalError, setGlobalError] = useState<string>("");
   const router = useRouter();
-  const { captchaRef, getCaptchaToken, resetCaptcha } = useCaptcha();
+  // const { captchaRef, getCaptchaToken, resetCaptcha } = useCaptcha();
 
   const [
     login,
@@ -50,16 +50,16 @@ export default function Login() {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setGlobalError("");
     try {
-      const captcha = getCaptchaToken(); // Use the getCaptchaToken function from the hook
-      if (!captcha) {
-        setGlobalError("Please complete the CAPTCHA verification.");
-        return;
-      }
+      // const captcha = getCaptchaToken(); // Use the getCaptchaToken function from the hook
+      // if (!captcha) {
+      //   setGlobalError("Please complete the CAPTCHA verification.");
+      //   return;
+      // }
 
-      resetCaptcha();
+      // resetCaptcha();
       const credentials = {
         ...values, // This will include email and password from the form
-        captcha, // Add CAPTCHA token
+        // captcha, // Add CAPTCHA token
       };
       await login(credentials);
     } catch (error) {
@@ -151,7 +151,7 @@ export default function Login() {
                 )}
               />
             </div>
-            <Recaptcha captchaRef={captchaRef} />
+            {/* <Recaptcha captchaRef={captchaRef} /> */}
 
             <div className="w-full">
               {isLoadingLogin ? (

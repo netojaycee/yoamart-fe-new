@@ -31,7 +31,7 @@ export default function Main({ id }: { id: string }) {
     return (
       <NoItemFound
         title1="Your Product with this ID was not found"
-        // title2="Visit our store now to explore our products"
+        title2="Visit our store now to explore our products"
       />
     );
   }
