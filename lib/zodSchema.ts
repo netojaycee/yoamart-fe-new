@@ -163,7 +163,8 @@ export const insertProductSchema = z.object({
         .string()
         .optional(),
     price: z.coerce.number().min(1, "Price must be at least 1 naira"),
-    quantity: z.coerce.number().min(1, 'Quantity must be at least 1'),
+    // quantity: z.coerce.number().min(1, 'Quantity must be at least 1'), // Auto-calculated from batches summation in backend
+    quantity: z.coerce.number().optional(), // Made optional - auto-calculated from batches in backend
     categoryId: z.string({ required_error: "Category is required" }),
 });
 

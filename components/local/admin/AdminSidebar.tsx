@@ -9,6 +9,7 @@ import {
   ShoppingBasket,
   UserRoundPlus,
   Bike,
+  AlertCircle,
 } from "lucide-react";
 
 import {
@@ -62,6 +63,29 @@ export function AdminSidebar({
             title: "Categories",
             url: "/admin/all-categories",
             icon: ChartBarStacked,
+          },
+        ],
+      },
+      {
+        title: "Inventory",
+        url: "#",
+        icon: ShoppingBasket,
+        collapsible: true,
+        items: [
+          {
+            title: "Batches",
+            url: "/admin/batches",
+            icon: ShoppingBasket,
+          },
+          {
+            title: "Alerts",
+            url: "/admin/alerts",
+            icon: AlertCircle,
+          },
+          {
+            title: "Actions",
+            url: "/admin/actions",
+            icon: BookOpen,
           },
         ],
       },

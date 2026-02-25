@@ -70,7 +70,7 @@ export default function AddEditProduct({
       name: type === "edit" ? data?.name : "",
       price: type === "edit" ? data?.price : 1,
       categoryId: type === "edit" ? data?.categoryId._id : "",
-      quantity: type === "edit" ? data?.quantity : 1,
+      // quantity: type === "edit" ? data?.quantity : 1, // Auto-calculated from batches summation in backend
       description: type === "edit" ? data?.description : "",
       image: "",
     },
@@ -225,7 +225,9 @@ export default function AddEditProduct({
               />
             </div>
           </div>
-          <FormField
+          
+          {/* Quantity field - Auto-calculated from batches summation in backend */}
+          {/* <FormField
             control={form.control}
             name="quantity"
             render={({ field }) => (
@@ -244,7 +246,8 @@ export default function AddEditProduct({
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
+
           <FormField
             control={form.control}
             name="description"

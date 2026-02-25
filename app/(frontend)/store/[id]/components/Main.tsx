@@ -24,12 +24,14 @@ export default function Main({ id }: { id: string }) {
   const products: Product[] = data ? data.products : [];
   const productData: Product = product.product;
 
+  // console.log(productData);
+
   // Check if the produt was found
   if (!productData) {
     return (
       <NoItemFound
         title1="Your Product with this ID was not found"
-        title2="Visit our store now to explore our products"
+        // title2="Visit our store now to explore our products"
       />
     );
   }

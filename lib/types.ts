@@ -152,3 +152,77 @@ export interface Driver {
 }
 
 export type { Order, OrderItem, ApiResponse };
+
+// ==================== INVENTORY EXPIRY TYPES ====================
+
+export interface Batch {
+  _id: string;
+  productId: {
+    _id: string;
+    name: string;
+    price: number;
+    category?: string;
+  };
+  expiryDate: string;
+  productionDate: string;
+  quantityTotal: number;
+  quantityAvailable: number;
+  status: "ACTIVE" | "NEAR_EXPIRY" | "EXPIRED" | "REMOVED" | "DISPOSED_RETURNED";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Alert {
+  _id: string;
+  batchId: {
+    _id: string;
+    productId: {
+      _id: string;
+      name: string;
+      price?: number;
+    };
+    expiryDate: string;
+    quantityAvailable: number;
+    status: string;
+  };
+  ruleId?: {
+    _id: string;
+    ruleName: string;
+    daysBeforeExpiry: number;
+  };
+  alertType: string;
+  alertDate: string;
+  acknowledged: boolean;
+  acknowledgedAt?: string;
+  acknowledgedBy?: string;
+  createdAt: string;
+}
+
+export interface AlertRule {
+  _id: string;
+  ruleName: string;
+  daysBeforeExpiry: number;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface Action {
+  _id: string;
+  batchId: {
+    _id: string;
+    productId: {
+      _id: string;
+      name: string;
+    };
+  };
+  alertId?: {
+    _id: string;
+    alertType: string;
+  };
+  actionType: "REMOVED_FROM_SHELF" | "DISPOSED" | "RETURNED_TO_SUPPLIER" | "RECOUNTED" | "OTHER";
+  quantityAffected: number;
+  performedBy: string;
+  performedAt: string;
+  notes: string;
+  createdAt: string;
+}

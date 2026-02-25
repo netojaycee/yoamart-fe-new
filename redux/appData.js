@@ -4,9 +4,9 @@ import Cookies from "js-cookie";
 import { clearCredentials, setCredentials } from "./slices/authSlice";
 
 const baseQuery = fetchBaseQuery({
-  // baseUrl: "http://localhost:5004/api/",
+  baseUrl: "http://localhost:5004/api/",
   // baseUrl: "https://yoamart.com/api",
-  baseUrl: "https://yoamart-be-new.onrender.com/api",
+  // baseUrl: "https://yoamart-be-new.onrender.com/api",
   prepareHeaders: (headers) => {
     const token = Cookies.get("token");
     if (token) {
@@ -39,7 +39,7 @@ const baseQuery = fetchBaseQuery({
 export const productsApi = createApi({
   reducerPath: "products",
   baseQuery,
-  tagTypes: ["Category", "Product", "Order", "OrderID", "Driver"],
+  tagTypes: ["Category", "Product", "Order", "OrderID", "Driver", "Batch", "Alert", "AlertRule", "Action"],
 
   endpoints: (builder) => ({
     // start optimistic updates yet to be tested
@@ -669,6 +669,220 @@ export const productsApi = createApi({
       query: () => "/google",
       // headers: { "Content-Type": "application/json" },
     }),
+
+    // ==================== BATCH ENDPOINTS ====================
+    createBatch: builder.mutation({
+      query: (credentials) => ({
+        url: "/batch/create",
+        method: "POST",
+        body: credentials,
+        headers: { "Content-Type": "application/json" },
+      }),
+      onQueryStarted: async (arg, { queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+        } catch (err) {
+          console.error("Batch creation failed:", err);
+        }
+      },
+      invalidatesTags: ["Batch"],
+    }),
+
+    getAllBatches: builder.query({
+      query: ({ page = 1, limit = 10, status, productId } = {}) => {
+        const params = new URLSearchParams();
+        if (page) params.append("page", page);
+        if (limit) params.append("limit", limit);
+        if (status) params.append("status", status);
+        if (productId) params.append("productId", productId);
+        return `/batch?${params.toString()}`;
+      },
+      providesTags: ["Batch"],
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    getBatchById: builder.query({
+      query: (batchId) => `/batch/${batchId}`,
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    updateBatchQuantity: builder.mutation({
+      query: ({ batchId, quantityAvailable }) => ({
+        url: `/batch/${batchId}/quantity`,
+        method: "PATCH",
+        body: { quantityAvailable },
+        headers: { "Content-Type": "application/json" },
+      }),
+      onQueryStarted: async (arg, { queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+        } catch (err) {
+          console.error("Batch quantity update failed:", err);
+        }
+      },
+      invalidatesTags: ["Batch"],
+    }),
+
+    getBatchesByStatus: builder.query({
+      query: (status) => `/batch/status/${status}`,
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    // ==================== ALERT ENDPOINTS ====================
+    getAllAlerts: builder.query({
+      query: ({ acknowledged, page = 1, limit = 10 } = {}) => {
+        const params = new URLSearchParams();
+        if (page) params.append("page", page);
+        if (limit) params.append("limit", limit);
+        if (acknowledged !== undefined) params.append("acknowledged", acknowledged);
+        return `/alert?${params.toString()}`;
+      },
+      providesTags: ["Alert"],
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    getOpenAlerts: builder.query({
+      query: () => "/alert/open",
+      providesTags: ["Alert"],
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    getAlertById: builder.query({
+      query: (alertId) => `/alert/${alertId}`,
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    acknowledgeAlert: builder.mutation({
+      query: ({ alertId, acknowledgedBy }) => ({
+        url: `/alert/${alertId}/acknowledge`,
+        method: "PATCH",
+        body: { acknowledgedBy },
+        headers: { "Content-Type": "application/json" },
+      }),
+      onQueryStarted: async (arg, { queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+        } catch (err) {
+          console.error("Alert acknowledgement failed:", err);
+        }
+      },
+      invalidatesTags: ["Alert"],
+    }),
+
+    getAlertsByBatch: builder.query({
+      query: (batchId) => `/alert/batch/${batchId}`,
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    // ==================== ALERT RULE ENDPOINTS ====================
+    createAlertRule: builder.mutation({
+      query: (credentials) => ({
+        url: "/alert-rule/create",
+        method: "POST",
+        body: credentials,
+        headers: { "Content-Type": "application/json" },
+      }),
+      onQueryStarted: async (arg, { queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+        } catch (err) {
+          console.error("Alert rule creation failed:", err);
+        }
+      },
+      invalidatesTags: ["AlertRule"],
+    }),
+
+    getAllAlertRules: builder.query({
+      query: ({ active } = {}) => {
+        const params = new URLSearchParams();
+        if (active !== undefined) params.append("active", active);
+        return `/alert-rule?${params.toString()}`;
+      },
+      providesTags: ["AlertRule"],
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    getDefaultAlertRule: builder.query({
+      query: () => "/alert-rule/default",
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    getAlertRuleById: builder.query({
+      query: (ruleId) => `/alert-rule/${ruleId}`,
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    updateAlertRule: builder.mutation({
+      query: ({ ruleId, credentials }) => ({
+        url: `/alert-rule/${ruleId}`,
+        method: "PATCH",
+        body: credentials,
+        headers: { "Content-Type": "application/json" },
+      }),
+      onQueryStarted: async (arg, { queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+        } catch (err) {
+          console.error("Alert rule update failed:", err);
+        }
+      },
+      invalidatesTags: ["AlertRule"],
+    }),
+
+    deleteAlertRule: builder.mutation({
+      query: (ruleId) => ({
+        url: `/alert-rule/${ruleId}`,
+        method: "DELETE",
+      }),
+      onQueryStarted: async (arg, { queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+        } catch (err) {
+          console.error("Alert rule deletion failed:", err);
+        }
+      },
+      invalidatesTags: ["AlertRule"],
+    }),
+
+    // ==================== ACTION ENDPOINTS ====================
+    logAction: builder.mutation({
+      query: (credentials) => ({
+        url: "/action/log",
+        method: "POST",
+        body: credentials,
+        headers: { "Content-Type": "application/json" },
+      }),
+      onQueryStarted: async (arg, { queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+        } catch (err) {
+          console.error("Action logging failed:", err);
+        }
+      },
+      invalidatesTags: ["Action", "Batch"],
+    }),
+
+    getAllActions: builder.query({
+      query: ({ page = 1, limit = 10, batchId } = {}) => {
+        const params = new URLSearchParams();
+        if (page) params.append("page", page);
+        if (limit) params.append("limit", limit);
+        if (batchId) params.append("batchId", batchId);
+        return `/action?${params.toString()}`;
+      },
+      providesTags: ["Action"],
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    getActionById: builder.query({
+      query: (actionId) => `/action/${actionId}`,
+      headers: { "Content-Type": "application/json" },
+    }),
+
+    getActionsByBatch: builder.query({
+      query: (batchId) => `/action/batch/${batchId}`,
+      headers: { "Content-Type": "application/json" },
+    }),
   }),
 });
 
@@ -720,4 +934,32 @@ export const {
   useDeleteDriverMutation,
 
   useGetGoogleSigninQuery,
+
+  // Batch exports
+  useCreateBatchMutation,
+  useGetAllBatchesQuery,
+  useGetBatchByIdQuery,
+  useUpdateBatchQuantityMutation,
+  useGetBatchesByStatusQuery,
+
+  // Alert exports
+  useGetAllAlertsQuery,
+  useGetOpenAlertsQuery,
+  useGetAlertByIdQuery,
+  useAcknowledgeAlertMutation,
+  useGetAlertsByBatchQuery,
+
+  // Alert Rule exports
+  useCreateAlertRuleMutation,
+  useGetAllAlertRulesQuery,
+  useGetDefaultAlertRuleQuery,
+  useGetAlertRuleByIdQuery,
+  useUpdateAlertRuleMutation,
+  useDeleteAlertRuleMutation,
+
+  // Action exports
+  useLogActionMutation,
+  useGetAllActionsQuery,
+  useGetActionByIdQuery,
+  useGetActionsByBatchQuery,
 } = productsApi;
