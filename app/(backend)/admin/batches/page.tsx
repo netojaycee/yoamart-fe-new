@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus, AlertCircle } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useGetAllBatchesQuery, useGetAllProductQuery } from "@/redux/appData";
 import { toast } from "sonner";
 import CustomLoader from "@/components/local/CustomLoader";
@@ -73,6 +74,7 @@ function getDaysUntilExpiry(expiryDate: string): number {
 }
 
 export default function BatchesPage() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
@@ -264,7 +266,11 @@ export default function BatchesPage() {
                         </span>
                       </TableCell>
                       <TableCell className="text-center">
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => router.push(`/admin/batches/${batch._id}`)}
+                        >
                           <span className="text-blue-600 hover:text-blue-800">View</span>
                         </Button>
                       </TableCell>
