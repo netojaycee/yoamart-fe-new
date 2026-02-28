@@ -16,7 +16,7 @@ export default function FooterMain() {
   const { data: categoryData, isLoading: categoryLoading } =
     useGetAllCategoryQuery(undefined);
   const { data: productData, isLoading: productLoading } =
-    useGetAllProductQuery({ page: 1, limit: 600 });
+    useGetAllProductQuery({ page: 1, limit: 600, type: "regular" });
 
   if (categoryLoading || productLoading) {
     return;

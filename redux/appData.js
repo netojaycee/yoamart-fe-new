@@ -312,6 +312,7 @@ export const productsApi = createApi({
         sort,
         inStock,
         outOfStock,
+        type,
       }) => {
         const queryParams = new URLSearchParams();
         if (page) queryParams.append("page", page.toString());
@@ -326,6 +327,7 @@ export const productsApi = createApi({
         if (sort) queryParams.append("sort", sort);
         if (inStock) queryParams.append("inStock", inStock.toString());
         if (outOfStock) queryParams.append("outOfStock", outOfStock.toString());
+        if (type) queryParams.append("type", type);
 
         return `/product/products?${queryParams.toString()}`;
       },
@@ -728,6 +730,22 @@ export const productsApi = createApi({
       headers: { "Content-Type": "application/json" },
     }),
 
+    deleteBatch: builder.mutation({
+      query: (batchId) => ({
+        url: `/batch/${batchId}`,
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }),
+      onQueryStarted: async (arg, { queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+        } catch (err) {
+          console.error("Batch deletion failed:", err);
+        }
+      },
+      invalidatesTags: ["Batch"],
+    }),
+
     // ==================== ALERT ENDPOINTS ====================
     getAllAlerts: builder.query({
       query: ({ acknowledged, page = 1, limit = 10 } = {}) => {
@@ -941,6 +959,7 @@ export const {
   useGetBatchByIdQuery,
   useUpdateBatchQuantityMutation,
   useGetBatchesByStatusQuery,
+  useDeleteBatchMutation,
 
   // Alert exports
   useGetAllAlertsQuery,
@@ -962,4 +981,5 @@ export const {
   useGetAllActionsQuery,
   useGetActionByIdQuery,
   useGetActionsByBatchQuery,
+
 } = productsApi;

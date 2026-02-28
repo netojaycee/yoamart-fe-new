@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import DeleteForm from "./DeleteForm";
 import AddEditProduct from "./AddEditProduct";
+import AddEditPerishableProduct from "./AddEditPerishableProduct";
 import AddEditCategory from "./AddEditCategory";
 import { Category, Driver, Product } from "@/lib/types";
 import AddEditDriver from "./AddEditDriver";
@@ -36,6 +37,9 @@ export function CustomDialog({
         <DialogTitle>{type + " " + title}</DialogTitle>
         {title === "product" && (type === "edit" || type === "add") && (
           <AddEditProduct onClose={onOpenChange} data={data} type={type} />
+        )}
+        {title === "perishable_product" && (type === "edit" || type === "add") && (
+          <AddEditPerishableProduct onClose={onOpenChange} data={data} type={type} />
         )}
         {title === "category" && (type === "edit" || type === "add") && (
           <AddEditCategory onClose={onOpenChange} data={data} type={type} />

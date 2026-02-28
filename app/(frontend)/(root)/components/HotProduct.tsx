@@ -12,6 +12,7 @@ export default function HotProduct() {
   const { data, isLoading, error } = useGetAllProductQuery({
     page: 1,
     limit: 604,
+    type: "regular",
   });
 
   const item: Product = data?.products.find(

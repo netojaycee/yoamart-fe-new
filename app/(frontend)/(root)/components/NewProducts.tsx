@@ -12,6 +12,7 @@ export default function NewProducts() {
   const { data, isLoading, error } = useGetAllProductQuery({
     page: 1,
     limit: 20,
+    type: "regular",
   });
   const products: Product[] = data ? data.products : [];
   const shuffledData: Product[] = shuffleArray([...products]);

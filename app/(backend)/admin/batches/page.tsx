@@ -88,6 +88,7 @@ export default function BatchesPage() {
   const { data: productsData } = useGetAllProductQuery({
     page: 1,
     limit: 1000,
+    type: "perishable",
   });
 
   const batches: Batch[] = data?.batches || [];

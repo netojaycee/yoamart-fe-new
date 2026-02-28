@@ -4,7 +4,10 @@ import {
   useGetBatchByIdQuery,
   useGetAlertsByBatchQuery,
   useGetActionsByBatchQuery,
+  useUpdateBatchQuantityMutation,
+  useDeleteBatchMutation,
 } from "@/redux/appData";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import CustomLoader from "@/components/local/CustomLoader";
@@ -21,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Batch, Alert, Action } from "@/lib/types";
+import { toast } from "sonner";
 
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: "bg-green-500",
@@ -60,6 +64,10 @@ function getDaysUntilExpiry(expiryDate: string): number {
 }
 
 export default function BatchDetailPage() {
+  const [editMode, setEditMode] = useState(false);
+  const [quantity, setQuantity] = useState<number | null>(null);
+  const [updateBatchQuantity, { isLoading: isUpdating }] = useUpdateBatchQuantityMutation();
+  const [deleteBatch, { isLoading: isDeleting }] = useDeleteBatchMutation();
   const params = useParams();
   const router = useRouter();
   const batchId = params.batchId as string;
@@ -105,6 +113,40 @@ export default function BatchDetailPage() {
 
   const daysLeft = getDaysUntilExpiry(batch.expiryDate);
 
+  // Handlers
+  const handleEditClick = () => {
+    setEditMode(true);
+    setQuantity(batch.quantityAvailable);
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(false);
+    setQuantity(null);
+  };
+
+  const handleSaveQuantity = async () => {
+    if (quantity == null || isNaN(quantity)) return;
+    try {
+      await updateBatchQuantity({ batchId, quantityAvailable: quantity }).unwrap();
+      setEditMode(false);
+    } catch (err) {
+      console.error("Failed to update quantity:", err);
+      // Optionally show error
+      toast.error("Failed to update quantity");
+    }
+  };
+
+  const handleDeleteBatch = async () => {
+    if (!window.confirm("Are you sure you want to delete this batch? This action cannot be undone.")) return;
+    try {
+      await deleteBatch(batchId).unwrap();
+      router.push("/admin/batches");
+    } catch (err) {
+      console.error("Failed to delete batch:", err);
+      toast.error("Failed to delete batch");
+    }
+  };
+
   return (
     <div className="flex-1 p-6">
       {/* Header */}
@@ -126,6 +168,18 @@ export default function BatchDetailPage() {
 
       {/* Batch Information Card */}
       <Card className="mb-6">
+        <div className="flex justify-end gap-2 p-4">
+          {!editMode && (
+            <>
+              <Button variant="outline" size="sm" onClick={handleEditClick} disabled={isUpdating}>
+                Edit Quantity
+              </Button>
+              <Button variant="destructive" size="sm" onClick={handleDeleteBatch} disabled={isDeleting}>
+                {isDeleting ? "Deleting..." : "Delete Batch"}
+              </Button>
+            </>
+          )}
+        </div>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div>
@@ -231,8 +285,29 @@ export default function BatchDetailPage() {
 
             <div className="space-y-2">
               <p className="text-sm text-gray-600">Available Quantity</p>
-              <p className="text-3xl font-bold text-green-600">{batch.quantityAvailable}</p>
-              <p className="text-xs text-gray-500">units</p>
+              {editMode ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    max={batch.quantityTotal}
+                    value={quantity ?? batch.quantityAvailable}
+                    onChange={e => setQuantity(Number(e.target.value))}
+                    className="border rounded px-2 py-1 w-24 text-lg"
+                  />
+                  <Button size="sm" onClick={handleSaveQuantity} disabled={isUpdating}>
+                    {isUpdating ? "Saving..." : "Save"}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-3xl font-bold text-green-600">{batch.quantityAvailable}</p>
+                  <p className="text-xs text-gray-500">units</p>
+                </>
+              )}
             </div>
 
             <div className="space-y-2">

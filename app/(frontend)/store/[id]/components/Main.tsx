@@ -10,7 +10,7 @@ import { shuffleArray } from "@/hooks/shuffle";
 import NoItemFound from "@/components/local/NoItemFound";
 
 export default function Main({ id }: { id: string }) {
-  const { data, isLoading } = useGetAllProductQuery({ page: 1, limit: 60 });
+  const { data, isLoading } = useGetAllProductQuery({ page: 1, limit: 60, type: "regular" });
   const { data: product, isLoading: i } = useGetProductByIdQuery(id);
   if (isLoading || i) {
     // Handle the case where the product is not found

@@ -19,6 +19,7 @@ export default function BestSellers() {
   const { data, isLoading, error } = useGetAllProductQuery({
     page: 1,
     limit: 604,
+    type: "regular",
   });
 
   const bestSellers: Product[] = data?.products.filter(

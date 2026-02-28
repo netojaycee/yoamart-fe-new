@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -17,34 +17,25 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { Loader } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import { uploadImageToCloudinary } from "@/lib/Cloudinary";
 import { Category, Driver, Product } from "@/lib/types";
 import {
   useCreateProductMutation,
   useEditProductMutation,
-  useGetAllCategoryQuery,
 } from "@/redux/appData";
-import { insertProductSchema } from "@/lib/zodSchema";
+import { insertPerishableProductSchema } from "@/lib/zodSchema";
 import { toast } from "sonner";
 import ErrorMessage from "../auth/errorMessage";
 
-type ProductProp = z.infer<typeof insertProductSchema>;
+type PerishableProductProp = z.infer<typeof insertPerishableProductSchema>;
 
-export default function AddEditProduct({
+export default function AddEditPerishableProduct({
   data,
   onClose,
   type,
 }: {
-  data: Product | Category | Driver |undefined;
+  data: Product | Category | Driver | undefined;
   type: string;
   onClose: (open: boolean) => void;
 }) {
@@ -55,22 +46,16 @@ export default function AddEditProduct({
     type === "edit" ? data?.image[0] : ""
   );
 
-  const { data: dataCategory } = useGetAllCategoryQuery(undefined);
-  const categoryToDisplay: Category[] = dataCategory
-    ? dataCategory?.category
-    : [];
-
   const [createProduct, { isLoading }] = useCreateProductMutation();
 
   const [editProduct] = useEditProductMutation();
 
-  const form = useForm<ProductProp>({
-    resolver: zodResolver(insertProductSchema),
+  const form = useForm<PerishableProductProp>({
+    resolver: zodResolver(insertPerishableProductSchema),
     defaultValues: {
       name: type === "edit" ? data?.name : "",
       price: type === "edit" ? data?.price : 1,
-      categoryId: type === "edit" ? data?.categoryId._id : "",
-      // quantity: type === "edit" ? data?.quantity : 1, // Auto-calculated from batches summation in backend
+    //   categoryId: type === "edit" ? data?.categoryId?._id : "",
       description: type === "edit" ? data?.description : "",
       image: "",
     },
@@ -90,7 +75,7 @@ export default function AddEditProduct({
     }
   };
 
-  const onSubmit = async (values: ProductProp) => {
+  const onSubmit = async (values: PerishableProductProp) => {
     try {
       setGlobalError("");
       if (!imageFile && !imageUrl) {
@@ -117,12 +102,10 @@ export default function AddEditProduct({
         values.image = imageUrl;
       }
 
-      // console.log(values);
-
-      // Add the type field for regular products
+      // Add the type field for perishable products
       const submissionData = {
         ...values,
-        type: "regular",
+        type: "perishable",
       };
 
       // Decide whether to create or update a product
@@ -134,8 +117,8 @@ export default function AddEditProduct({
       if (result?.data) {
         toast.success(
           type === "edit"
-            ? "Product updated successfully!"
-            : "Product added successfully!"
+            ? "Perishable product updated successfully!"
+            : "Perishable product added successfully!"
         );
         form.reset();
         setImageFile(null);
@@ -144,8 +127,8 @@ export default function AddEditProduct({
       } else {
         toast.error(
           type === "edit"
-            ? "Failed to update product."
-            : "Failed to add product."
+            ? "Failed to update perishable product."
+            : "Failed to add perishable product."
         );
       }
     } catch (error) {
@@ -176,83 +159,26 @@ export default function AddEditProduct({
             )}
           />
 
-          <div className="flex items-center gap-2 w-full">
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem className="w-1/2">
-                  <Label htmlFor="price" className="text-xs">
-                    Price
-                  </Label>
-                  <FormControl>
-                    <Input
-                      id="price"
-                      {...field}
-                      type="number"
-                      className="w-full"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex flex-col gap-[13px] w-1/2">
-              <Label htmlFor="category" className="text-xs">
-                Category
-              </Label>
-              <Controller
-                name="categoryId"
-                control={form.control}
-                render={({ field: { onChange, value } }) => (
-                  <Select onValueChange={onChange} value={value}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent className="">
-                      <SelectGroup>
-                        {categoryToDisplay ? (
-                          categoryToDisplay.map((category) => (
-                            <SelectItem key={category._id} value={category._id}>
-                              {category.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <div className="flex items-center gap-1 text-xs">
-                            No categories available.
-                            <Loader className="animate-spin" />
-                          </div>
-                        )}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-          
-          {/* Quantity field - Auto-calculated from batches summation in backend */}
-          {/* <FormField
+          <FormField
             control={form.control}
-            name="quantity"
+            name="price"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="quantity" className="text-xs">
-                  Quantity
+                <Label htmlFor="price" className="text-xs">
+                  Price
                 </Label>
                 <FormControl>
                   <Input
-                    id="quantity"
+                    id="price"
                     {...field}
-                    className="w-full"
                     type="number"
+                    className="w-full"
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
-          /> */}
+          />
 
           <FormField
             control={form.control}

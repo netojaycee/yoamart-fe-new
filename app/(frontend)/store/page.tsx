@@ -93,6 +93,7 @@ export default function Store() {
       sort,
       inStock,
       outOfStock,
+      type: "regular",
     },
     { refetchOnMountOrArgChange: true }
   );

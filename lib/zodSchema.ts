@@ -168,6 +168,23 @@ export const insertProductSchema = z.object({
     categoryId: z.string({ required_error: "Category is required" }),
 });
 
+export const insertPerishableProductSchema = z.object({
+    name: z.string({ required_error: "Name is required" }).min(
+        1,
+        "Name is required"
+    ),
+    description: z.string({ required_error: "Description is required" }).min(
+        1,
+        "Description is required"
+    ),
+    image: z
+        .string()
+        .optional(),
+    price: z.coerce.number().min(1, "Price must be at least 1 naira"),
+    // Category is optional for perishable products
+    categoryId: z.string().optional(),
+});
+
 export const insertCategorySchema = z.object({
     name: z.string({ required_error: "Name is required" }).min(
         1,

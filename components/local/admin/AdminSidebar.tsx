@@ -10,6 +10,7 @@ import {
   UserRoundPlus,
   Bike,
   AlertCircle,
+  Box,
 } from "lucide-react";
 
 import {
@@ -72,6 +73,11 @@ export function AdminSidebar({
         icon: ShoppingBasket,
         collapsible: true,
         items: [
+          {
+            title: "Perishable Products",
+            url: "/admin/perishable-products",
+            icon: Box,
+          },
           {
             title: "Batches",
             url: "/admin/batches",
